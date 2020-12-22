@@ -46,16 +46,7 @@ class Container
 
         return $this->databaseService;
     }
-//
-//    public function getUserService()
-//    {
-//        if ($this->userService === null) {
-//            $this->userService = new UserService($this->getDatabaseService(), $this->getFormHandler(),$this->viewService,$this->getUploadService());
-//        }
-//
-//        return $this->userService;
-//    }
-//
+
     public function getFormHandler()
     {
         if ($this->formHandler === null) {

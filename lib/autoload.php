@@ -21,8 +21,6 @@ $_application_folder = "/questi-proef2";
 $_root_folder = $_SERVER['DOCUMENT_ROOT'];
 date_default_timezone_set('Europe/Amsterdam');
 
-//load Models
-//require_once $_root_folder . "/Model/User.php";
 
 //load Services
 require_once $_root_folder . "/services/Container.php";
@@ -39,4 +37,3 @@ session_start();
 
 $container = new Container($connectionData);
 $viewService = $container->getViewService();
-//$userService = $container->getUserService();

@@ -47,6 +47,7 @@ class FormHandler
 
             $decoded = json_decode($response);
             var_dump($decoded);
+
             if ($decoded->access_token === "") {
                 echo "Invalid credentials - please try again";
             } else {
@@ -87,8 +88,14 @@ class FormHandler
                         $_SESSION['user_lang'] = $userLang;
                         $_SESSION['signed_agreement'] = $signed_agreement;
                         $_SESSION['token'] = $decoded->access_token;
-                        var_dump($_SESSION);
+//                        var_dump($_SESSION);
                         $authenticationSuccess = true;
+                        if($_SESSION['signed_agreement'] === 0)
+                        {
+                            $_SESSION['show_modal'] = true;
+                        } else {
+                            $_SESSION['show_modal'] = false;
+                        }
 
                     } else {
                         echo "User data could not be retrieved";
@@ -105,10 +112,35 @@ class FormHandler
 
         if ($this->authenticateClient())
         {
-            header('Location: '.$this->url.'/profile.php');
+            if($this->getEulContent() !== 0)
+            {
+                header('Location: '.$this->url.'/profile.php');
+            } else {
+                print "could not get eul text";
+            }
         } else {
             print "could not process login";
         }
+    }
+
+    public function getEulContent()
+    {
+        $ch = curl_init("https://apidev.questi.com/2.0/user/eul");
+        curl_setopt($ch, CURLOPT_URL, $this->api_url . '/user/eul');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            "Content-Type: application/x-www-form-urlencoded",
+            "Client-Id: " . $this->client_id,
+            "Client-Secret: " . $this->calculateChecksum(),
+            "Authorization: Bearer " . $_SESSION['token']
+        ));
+
+        $eulContent = curl_exec($ch);
+        curl_close($ch);
+
+        $jsonEulContent = json_decode($eulContent);
+        $_SESSION['eulHtml']= $jsonEulContent->result->eul_content;
+
     }
 
 
@@ -118,67 +150,5 @@ class FormHandler
         $client_secret = sha1(sha1($this->client_id . '_' . $this->client_secret_pre) . '_' . $date);
         return $client_secret;
     }
-
-
-    /**
-     * @param $userLogin
-     * @return bool
-     */
-
-//    public function checkIfUserIsInDatabase($userLogin)
-//    {
-//        // check if user already exists
-//        $data = $this->databaseService->getData("SELECT * FROM users WHERE usr_login='" . $userLogin . "' ");
-//        $userIsInDatabase = (count($data) > 0) ? true : false;
-//        return $userIsInDatabase;
-//    }
-
-    /**
-     * @return bool
-     */
-//    public function validatePostedUserData()
-//
-//    {
-//        $pass = true;
-//
-//        // check if user already exists
-//        if ($this->checkIfUserIsInDatabase($_POST['usr_login'])) {
-//            $this->viewService->addMessage("Deze login bestaat al!", "error");
-//            $pass = false;
-//        }
-//
-//        //check password
-//        if (strlen($_POST["usr_paswd"]) < 8) {
-//            $this->viewService->addMessage("Uw paswoord moet minimum 8 tekens lang zijn!", "error");
-//            $pass = false;
-//        }
-//
-//        //check email format
-//        if (!filter_var($_POST["usr_login"], FILTER_VALIDATE_EMAIL)) {
-//            $this->viewService->addMessage("Uw e-mail adres heeft een ongeldig formaat!", "error");
-//            $pass = false;
-//        }
-//
-//        // If all is ok return true
-//        return $pass;
-//    }
-
-
-    /**
-     * @return array File
-     */
-
-//    public function getFilesFromForm()
-//    {
-//        $filesModels = [];
-//        foreach ($_FILES as $formFieldName =>$file)
-//        {
-//            // create file objects from uploaded files
-//            if($file['name'] == "")continue;
-//            $x = new File($file,$formFieldName);
-//            $filesModels[] = $x;
-//        }
-//        return $filesModels;
-//    }
 
 }
