@@ -7,6 +7,8 @@ class Container
 
     private $pdo;
 
+    private $clientCredentials;
+
     private $databaseService;
 
     private $viewService;
@@ -40,6 +42,21 @@ class Container
         return $this->pdo;
     }
 
+    public function getClientCredentials()
+    {
+        if ($this->clientCredentials === null) {
+            $this->clientCredentials = array(
+                "api_url" => "https://apidev.questi.com/2.0",
+                "url" => "http://localhost:8080",
+                "grant_type" => "password",
+                "scope" => "sollicitatie-scope",
+                "client_id" => "q-sollicitatie-nifu",
+                "client_secret_pre" => "5Wlu8Fq3wSBxIPa4vB9AOGPCyQ8QwVw0w5MjFzTXj8pdeDWziG",
+            );
+        }
+        return $this->clientCredentials;
+    }
+
     public function getDatabaseService()
     {
         if ($this->databaseService === null) {
@@ -52,7 +69,10 @@ class Container
     public function getFormHandler()
     {
         if ($this->formHandler === null) {
-            $this->formHandler = new FormHandler($this->getViewService());
+            $this->formHandler = new FormHandler(
+                $this->getViewService(),
+                $this->getClientCredentials()
+            );
         }
 
         return $this->formHandler;
@@ -61,7 +81,10 @@ class Container
     public function getAgreementHandler()
     {
         if ($this->agreementHandler === null) {
-            $this->agreementHandler = new AgreementHandler($this->getViewService());
+            $this->agreementHandler = new AgreementHandler(
+                $this->getViewService(),
+                $this->getClientCredentials()
+            );
         }
 
         return $this->agreementHandler;

@@ -4,22 +4,22 @@
 class AgreementHandler
 {
     private $viewService;
-    private $api_url = "https://apidev.questi.com/2.0";
-    private $url = "http://localhost:8080";
-    private $grant_type = 'password';
-    private $scope = 'sollicitatie-scope';
-    private $client_id = 'q-sollicitatie-nifu';
-    private $client_secret_pre = '5Wlu8Fq3wSBxIPa4vB9AOGPCyQ8QwVw0w5MjFzTXj8pdeDWziG';
+    private $api_url;
+    private $url;
+    private $client_id;
+    private $client_secret_pre;
 
-
-    public function __construct(ViewService $viewService)
+    public function __construct(ViewService $viewService, array $clientCredentials)
     {
         $this->viewService = $viewService;
+        $this->api_url = $clientCredentials['api_url'];
+        $this->client_id = $clientCredentials['client_id'];
+        $this->client_secret_pre = $clientCredentials['client_secret_pre'];
     }
 
     public function submitSignedAgreement()
     {
-        $ch = curl_init("https://apidev.questi.com/2.0/user/eul");
+        $ch = curl_init($this->api_url."/user/eul");
         curl_setopt($ch, CURLOPT_URL, $this->api_url.'/user/eul');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");

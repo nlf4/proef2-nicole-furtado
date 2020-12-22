@@ -82,7 +82,6 @@ class ViewService
      * @return string
      */
 
-    /* Deze functie voegt data en template samen en print het resultaat */
     public function replaceContentOneRow($row, $template_html )
     {
         //replace fields with values in template

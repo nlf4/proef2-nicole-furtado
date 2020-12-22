@@ -5,16 +5,22 @@ class FormHandler
 {
 
     private $viewService;
-    private $api_url = "https://apidev.questi.com/2.0";
-    private $url = "http://localhost:8080";
-    private $grant_type = 'password';
-    private $scope = 'sollicitatie-scope';
-    private $client_id = 'q-sollicitatie-nifu';
-    private $client_secret_pre = '5Wlu8Fq3wSBxIPa4vB9AOGPCyQ8QwVw0w5MjFzTXj8pdeDWziG';
+    private $api_url;
+    private $url;
+    private $grant_type;
+    private $scope;
+    private $client_id;
+    private $client_secret_pre;
 
-    public function __construct(ViewService $viewService)
+    public function __construct(ViewService $viewService, array $clientCredentials)
     {
         $this->viewService = $viewService;
+        $this->api_url = $clientCredentials['api_url'];
+        $this->url = $clientCredentials['url'];
+        $this->grant_type = $clientCredentials['grant_type'];
+        $this->scope = $clientCredentials['scope'];
+        $this->client_id = $clientCredentials['client_id'];
+        $this->client_secret_pre = $clientCredentials['client_secret_pre'];
     }
 
     public function authenticateClient()
@@ -27,44 +33,44 @@ class FormHandler
             $password = $_POST["password"];
 
             /*    Client authentication   *///////////////////////////
-
-            $ch = curl_init("https://apidev.questi.com/2.0/token");
+            $ch = curl_init($this->api_url."/token");
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
                 'emailaddr' => $username,
-                'passwrd' => "LR9K&rAr!S",
-                'grant_type' => "password",
-                'scope' => "sollicitatie-scope",
+                'passwrd' => $password,
+                'grant_type' => $this->grant_type,
+                'scope' => $this->scope,
             )));
 
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                 "Content-Type: application/x-www-form-urlencoded",
-                "Client-Id: q-sollicitatie-nifu",
-                "Client-Secret: 73227d4d52422616170ecdb1857128a68d595e0a"));
+                "Client-Id: ".$this->client_id,
+                "Client-Secret: ".$this->calculateChecksum()));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_NOPROGRESS, 0);
             $response = curl_exec($ch);
 
             $decoded = json_decode($response);
-            var_dump($decoded);
+//            var_dump($decoded);
 
-            if ($decoded->access_token === "") {
+            if (!isset($decoded->access_token)) {
                 echo "Invalid credentials - please try again";
+                die();
             } else {
 //                echo $decoded->access_token;
                 curl_close($ch);
 
                 /*  User authentication  *//////////////////////////
 
-                if (isset($decoded) && $decoded != '') {
+                if (isset($decoded) && $decoded !== '') {
 
-                    $ch2 = curl_init("https://apidev.questi.com/2.0/user");
+                    $ch2 = curl_init($this->api_url."/user");
                     curl_setopt($ch2, CURLOPT_URL, $this->api_url . '/user/');
                     curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
                     curl_setopt($ch2, CURLOPT_HTTPHEADER, array(
                         "Content-Type: application/x-www-form-urlencoded",
                         "Client-Id: " . $this->client_id,
-                        "Client-Secret: 73227d4d52422616170ecdb1857128a68d595e0a",
+                        "Client-Secret: ".$this->calculateChecksum(),
                         "Authorization: Bearer " . $decoded->access_token
                     ));
 
@@ -96,7 +102,6 @@ class FormHandler
                         } else {
                             $_SESSION['show_modal'] = false;
                         }
-
                     } else {
                         echo "User data could not be retrieved";
                     }
@@ -108,8 +113,6 @@ class FormHandler
 
     public function processLogIn()
     {
-        // if the form and user data is valid
-
         if ($this->authenticateClient())
         {
             if($this->getEulContent() !== 0)
@@ -126,7 +129,7 @@ class FormHandler
     public function getEulContent()
     {
         if ($_SESSION['signed_agreement'] === 0) {
-            $ch = curl_init("https://apidev.questi.com/2.0/user/eul");
+            $ch = curl_init($this->api_url."/user/eul");
             curl_setopt($ch, CURLOPT_URL, $this->api_url . '/user/eul');
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
