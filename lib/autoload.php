@@ -7,12 +7,6 @@
 //$_token_url = 'https://apidev.questi.com/2.0/token/?';
 //$_api_url = 'https://apidev.questi.com/2.0';
 
-$connectionData = array(
-    'db_dsn' => 'mysql:host=localhost;dbname=questi2',
-    "db_user" => "root",
-    "db_pass" => "dumpling6"
-);
-
 
 ini_set("error_reporting", E_ALL);
 ini_set('display_errors', 1);
@@ -30,8 +24,7 @@ require_once $_root_folder . "/services/FormHandler.php";
 require_once $_root_folder . "/services/AgreementHandler.php";
 
 //database functions
-//require_once $_root_folder . "/lib/passwd.php";
-
+require_once $_root_folder . "/lib/password.php";
 
 session_start();
 //$_SESSION["head_printed"] = false;
