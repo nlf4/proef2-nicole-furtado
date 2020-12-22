@@ -1,0 +1,38 @@
+body{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-height: 100vh;
+}
+
+.container {
+    display: flex;
+    width: 25%;
+    margin-top: 25px;
+}
+.jumbotron {
+    width: 100%;
+    height: 90px;
+    margin: 0;
+    padding: 0;
+}
+
+.form-group{
+    width: 400px;
+}
+
+.login-form {
+    border: 1px solid darkgrey;
+    padding: 20px;
+    margin: auto;
+}
+
+#submit-div{
+    display: flex;
+    justify-content: center;
+}
+
+.table {
+    width: 600px;
+}

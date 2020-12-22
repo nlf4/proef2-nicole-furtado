@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+
+    <form class="login_form" action="/lib/form_router.php" method="POST">
+
+        <input type="hidden" id="formname" name="formname" value="login_form">
+
+        <div class="form-group">
+            <label for="email_address">Email address</label>
+            <input type="email" class="form-control" id="email_address" aria-describedby="emailHelp" placeholder="Enter email" name="username" value="jaak.willems@questi.be">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Password" name="password">
+        </div>
+        <!--    <div class="form-check">-->
+        <!--        <label class="form-check-label" for="user_agreement" >I agree to the <a href="#" data-toggle="modal" data-target="#exampleModalCenter">Terms and Conditions</a></label>-->
+        <!--        <input type="checkbox" class="form-check-input" id="user_agreement" name="user_agreement">-->
+        <!--    </div>-->
+        <div id="submit-div">
+<!--            <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>-->
+            <input class="btn btn-primary" name="login_button" type="submit" value="Log in">
+        </div>
+
+    </form>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</body>
+</html>
