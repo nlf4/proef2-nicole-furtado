@@ -27,6 +27,7 @@ require_once $_root_folder . "/services/Container.php";
 require_once $_root_folder . "/services/DatabaseService.php";
 require_once $_root_folder . "/services/ViewService.php";
 require_once $_root_folder . "/services/FormHandler.php";
+require_once $_root_folder . "/services/AgreementHandler.php";
 
 //database functions
 //require_once $_root_folder . "/lib/passwd.php";

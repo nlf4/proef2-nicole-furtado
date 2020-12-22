@@ -1,4 +1,4 @@
-<div class="modal" tabindex="-1">
+<div class="modal" tabindex="-1" id="eul-modal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,7 +8,10 @@
                 <p>@@text@@</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <form class="eul_form" action="/lib/form_router.php" method="POST">
+                    <input type="hidden" id="formname" name="formname" value="eul_form">
+                    <input class="btn btn-primary" name="eul_button" type="submit" value="Akkoord" data-toggle="modal" data-target="#eul-modal">
+                </form>
             </div>
         </div>
     </div>

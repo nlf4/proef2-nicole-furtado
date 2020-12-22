@@ -15,9 +15,16 @@ switch ( $formname )
             $formHandler->processLogIn();
         }
         break;
+
     case "eul_form":
 
+        if ($_POST['eul_button'] == "Akkoord")
+        {
+            $agreementHandler = $container->getAgreementHandler();
+            $agreementHandler->processSignedAgreement();
+        }
         break;
+
     default:
         // error message if no form is addressed
         print "ERROR - no form was submitted";

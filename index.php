@@ -4,5 +4,5 @@ $login_form = true;
 require_once "lib/autoload.php";
 
 $css = array( "style.css");
-$viewService->basicHead($css, "Login");
+$viewService->basicHead($css, "Log in");
 print $viewService->loadTemplate("login");

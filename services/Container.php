@@ -15,6 +15,8 @@ class Container
 
     private $formHandler;
 
+    private $agreementHandler;
+
 
     public function __construct(array $configuration)
     {
@@ -56,6 +58,14 @@ class Container
         return $this->formHandler;
     }
 
+    public function getAgreementHandler()
+    {
+        if ($this->agreementHandler === null) {
+            $this->agreementHandler = new AgreementHandler($this->getViewService());
+        }
+
+        return $this->agreementHandler;
+    }
 
 
     public function getViewService()

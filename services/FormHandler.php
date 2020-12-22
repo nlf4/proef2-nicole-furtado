@@ -125,30 +125,32 @@ class FormHandler
 
     public function getEulContent()
     {
-        $ch = curl_init("https://apidev.questi.com/2.0/user/eul");
-        curl_setopt($ch, CURLOPT_URL, $this->api_url . '/user/eul');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-            "Content-Type: application/x-www-form-urlencoded",
-            "Client-Id: " . $this->client_id,
-            "Client-Secret: " . $this->calculateChecksum(),
-            "Authorization: Bearer " . $_SESSION['token']
-        ));
+        if ($_SESSION['signed_agreement'] === 0) {
+            $ch = curl_init("https://apidev.questi.com/2.0/user/eul");
+            curl_setopt($ch, CURLOPT_URL, $this->api_url . '/user/eul');
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                "Content-Type: application/x-www-form-urlencoded",
+                "Client-Id: " . $this->client_id,
+                "Client-Secret: " . $this->calculateChecksum(),
+                "Authorization: Bearer " . $_SESSION['token']
+            ));
 
-        $eulContent = curl_exec($ch);
-        curl_close($ch);
+            $eulContent = curl_exec($ch);
+            curl_close($ch);
 
-        $jsonEulContent = json_decode($eulContent);
-        $_SESSION['eulHtml']= $jsonEulContent->result->eul_content;
-
+            $jsonEulContent = json_decode($eulContent);
+            $_SESSION['eulHtml'] = $jsonEulContent->result->eul_content;
+        } else {
+            return true;
+        }
     }
 
 
     public function calculateChecksum()
     {
         $date = date('Ymd');
-        $client_secret = sha1(sha1($this->client_id . '_' . $this->client_secret_pre) . '_' . $date);
-        return $client_secret;
+        return sha1(sha1($this->client_id . '_' . $this->client_secret_pre) . '_' . $date);
     }
 
 }
