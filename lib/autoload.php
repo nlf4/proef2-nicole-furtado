@@ -13,11 +13,13 @@ require_once $_root_folder . "/services/ViewService.php";
 require_once $_root_folder . "/services/FormHandler.php";
 require_once $_root_folder . "/services/AgreementHandler.php";
 
-//database functions
+//load database and client config
 require_once $_root_folder . "/lib/password.php";
+require_once $_root_folder . "/lib/client_cred.php";
 
 session_start();
-//$_SESSION["head_printed"] = false;
+$_SESSION["head_printed"] = false;
 
-$container = new Container($connectionData);
+$container = new Container($connectionData, $clientCredentials);
 $viewService = $container->getViewService();
+

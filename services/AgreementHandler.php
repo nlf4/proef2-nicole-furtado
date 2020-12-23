@@ -4,21 +4,37 @@
 class AgreementHandler
 {
     private $viewService;
+    /**
+     * @var string
+     */
     private $api_url;
+    /**
+     * @var string
+     */
     private $url;
+    /**
+     * @var string
+     */
     private $client_id;
-    private $client_secret_pre;
+    /**
+     * @var string
+     */
+    private $client_secret;
 
-    public function __construct(ViewService $viewService, array $clientCredentials)
+    public function __construct(ViewService $viewService, array $clientCredentials, string $client_secret)
     {
         $this->viewService = $viewService;
+        $this->client_secret = $client_secret;
         $this->api_url = $clientCredentials['api_url'];
         $this->client_id = $clientCredentials['client_id'];
-        $this->client_secret_pre = $clientCredentials['client_secret_pre'];
     }
 
+    /**
+     * @return bool
+     */
     public function submitSignedAgreement()
     {
+        // update user eul data
         $ch = curl_init($this->api_url."/user/eul");
         curl_setopt($ch, CURLOPT_URL, $this->api_url.'/user/eul');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -26,7 +42,7 @@ class AgreementHandler
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             "Content-Type: application/x-www-form-urlencoded",
             "Client-Id: ".$this->client_id,
-            "Client-Secret: ".$this->calculateChecksum(),
+            "Client-Secret: ".$this->client_secret,
             "Authorization: Bearer " . $_SESSION["token"]
         ));
         curl_setopt($ch, CURLOPT_POSTFIELDS,http_build_query(array(
@@ -43,6 +59,7 @@ class AgreementHandler
 
     public function processSignedAgreement()
     {
+        // direct back to profile on success
         if ($this->submitSignedAgreement())
         {
             header('Location: '.$this->url.'/profile.php');
@@ -51,9 +68,4 @@ class AgreementHandler
         }
     }
 
-    public function calculateChecksum()
-    {
-        $date = date('Ymd');
-        return sha1(sha1($this->client_id . '_' . $this->client_secret_pre) . '_' . $date);
-    }
 }

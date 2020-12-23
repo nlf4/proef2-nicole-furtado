@@ -3,26 +3,29 @@
 
 class Container
 {
-    private $configuration;
-
     private $pdo;
-
-    private $clientCredentials;
 
     private $databaseService;
 
     private $viewService;
 
-    private $userService;
-
     private $formHandler;
 
     private $agreementHandler;
+    /**
+     * @var array
+     */
+    private $credentialConfig;
+    /**
+     * @var array
+     */
+    private $dbConfig;
 
 
-    public function __construct(array $configuration)
+    public function __construct(array $dbConfig, array $credentialConfig)
     {
-        $this->configuration = $configuration;
+        $this->dbConfig = $dbConfig;
+        $this->credentialConfig = $credentialConfig;
     }
 
     /**
@@ -32,9 +35,9 @@ class Container
     {
         if ($this->pdo === null) {
             $this->pdo = new PDO(
-                $this->configuration['db_dsn'],
-                $this->configuration['db_user'],
-                $this->configuration['db_pass']
+                $this->dbConfig['db_dsn'],
+                $this->dbConfig['db_user'],
+                $this->dbConfig['db_pass']
             );
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
@@ -42,19 +45,10 @@ class Container
         return $this->pdo;
     }
 
-    public function getClientCredentials()
+    public function calculateChecksum()
     {
-        if ($this->clientCredentials === null) {
-            $this->clientCredentials = array(
-                "api_url" => "https://apidev.questi.com/2.0",
-                "url" => "http://localhost:8080",
-                "grant_type" => "password",
-                "scope" => "sollicitatie-scope",
-                "client_id" => "q-sollicitatie-nifu",
-                "client_secret_pre" => "5Wlu8Fq3wSBxIPa4vB9AOGPCyQ8QwVw0w5MjFzTXj8pdeDWziG",
-            );
-        }
-        return $this->clientCredentials;
+        $date = date('Ymd');
+        return sha1(sha1($this->credentialConfig['client_id'] . '_' . $this->credentialConfig['client_secret_pre']) . '_' . $date);
     }
 
     public function getDatabaseService()
@@ -71,7 +65,8 @@ class Container
         if ($this->formHandler === null) {
             $this->formHandler = new FormHandler(
                 $this->getViewService(),
-                $this->getClientCredentials()
+                $this->credentialConfig,
+                $this->calculateChecksum()
             );
         }
 
@@ -83,13 +78,13 @@ class Container
         if ($this->agreementHandler === null) {
             $this->agreementHandler = new AgreementHandler(
                 $this->getViewService(),
-                $this->getClientCredentials()
+                $this->credentialConfig,
+                $this->calculateChecksum()
             );
         }
 
         return $this->agreementHandler;
     }
-
 
     public function getViewService()
     {

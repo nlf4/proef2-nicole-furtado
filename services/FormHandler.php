@@ -5,30 +5,51 @@ class FormHandler
 {
 
     private $viewService;
+    /**
+     * @var string
+     */
     private $api_url;
+    /**
+     * @var string
+     */
     private $url;
+    /**
+     * @var string
+     */
     private $grant_type;
+    /**
+     * @var string
+     */
     private $scope;
+    /**
+     * @var string
+     */
     private $client_id;
-    private $client_secret_pre;
+    /**
+     * @var string
+     */
+    private $client_secret;
 
-    public function __construct(ViewService $viewService, array $clientCredentials)
+    public function __construct(ViewService $viewService, array $clientCredentials, string $client_secret)
     {
         $this->viewService = $viewService;
+        $this->client_secret = $client_secret;
         $this->api_url = $clientCredentials['api_url'];
         $this->url = $clientCredentials['url'];
         $this->grant_type = $clientCredentials['grant_type'];
         $this->scope = $clientCredentials['scope'];
         $this->client_id = $clientCredentials['client_id'];
-        $this->client_secret_pre = $clientCredentials['client_secret_pre'];
     }
 
+    /**
+     * @return bool
+     */
     public function authenticateClient()
     {
         $authenticationSuccess = false;
         if (isset($_POST["username"]) && $_POST["username"] != '') {
 
-            /*  set variables  */
+            /*  get form fields  */
             $username = $_POST["username"];
             $password = $_POST["password"];
 
@@ -41,15 +62,14 @@ class FormHandler
                 'grant_type' => $this->grant_type,
                 'scope' => $this->scope,
             )));
-
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                 "Content-Type: application/x-www-form-urlencoded",
                 "Client-Id: ".$this->client_id,
-                "Client-Secret: ".$this->calculateChecksum()));
+                "Client-Secret: ".$this->client_secret));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_NOPROGRESS, 0);
-            $response = curl_exec($ch);
 
+            $response = curl_exec($ch);
             $decoded = json_decode($response);
 //            var_dump($decoded);
 
@@ -70,7 +90,7 @@ class FormHandler
                     curl_setopt($ch2, CURLOPT_HTTPHEADER, array(
                         "Content-Type: application/x-www-form-urlencoded",
                         "Client-Id: " . $this->client_id,
-                        "Client-Secret: ".$this->calculateChecksum(),
+                        "Client-Secret: ".$this->client_secret,
                         "Authorization: Bearer " . $decoded->access_token
                     ));
 
@@ -78,24 +98,22 @@ class FormHandler
                     curl_close($ch2);
 
                     $jsonArrayResponse = json_decode($userData);
-                    var_dump($jsonArrayResponse);
-                    if ($jsonArrayResponse->status === "success") {
-                        $userName = $jsonArrayResponse->result->user_name;
-                        $userFirstName = $jsonArrayResponse->result->user_firstname;
-                        $userEmail = $jsonArrayResponse->result->user_email;
-                        $userMobile = $jsonArrayResponse->result->user_mobile;
-                        $userLang = $jsonArrayResponse->result->user_language;
-                        $signed_agreement = $jsonArrayResponse->result->signed_agreement;
+//                    var_dump($jsonArrayResponse);
 
-                        $_SESSION['user_name'] = $userName;
-                        $_SESSION['user_firstname'] = $userFirstName;
-                        $_SESSION['user_email'] = $userEmail;
-                        $_SESSION['user_mobile'] = $userMobile;
-                        $_SESSION['user_lang'] = $userLang;
-                        $_SESSION['signed_agreement'] = $signed_agreement;
+                    // set session variables
+                    if ($jsonArrayResponse->status === "success") {
+                        $_SESSION['user_name'] = $jsonArrayResponse->result->user_name;
+                        $_SESSION['user_firstname'] = $jsonArrayResponse->result->user_firstname;
+                        $_SESSION['user_email'] = $jsonArrayResponse->result->user_email;
+                        $_SESSION['user_mobile'] = $jsonArrayResponse->result->user_mobile;
+                        $_SESSION['user_lang'] = $jsonArrayResponse->result->user_language;
+                        $_SESSION['signed_agreement'] = $jsonArrayResponse->result->signed_agreement;
                         $_SESSION['token'] = $decoded->access_token;
+
 //                        var_dump($_SESSION);
                         $authenticationSuccess = true;
+
+                        //if agreement not signed, show modal
                         if($_SESSION['signed_agreement'] === 0)
                         {
                             $_SESSION['show_modal'] = true;
@@ -111,8 +129,12 @@ class FormHandler
         return $authenticationSuccess;
     }
 
+    /**
+     * @return mixed
+     */
     public function processLogIn()
     {
+        // direct to profile on success
         if ($this->authenticateClient())
         {
             if($this->getEulContent() !== 0)
@@ -126,8 +148,12 @@ class FormHandler
         }
     }
 
+    /**
+     * @return bool
+     */
     public function getEulContent()
     {
+        // get user agreement content if needed and set to session variable
         if ($_SESSION['signed_agreement'] === 0) {
             $ch = curl_init($this->api_url."/user/eul");
             curl_setopt($ch, CURLOPT_URL, $this->api_url . '/user/eul');
@@ -135,7 +161,7 @@ class FormHandler
             curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                 "Content-Type: application/x-www-form-urlencoded",
                 "Client-Id: " . $this->client_id,
-                "Client-Secret: " . $this->calculateChecksum(),
+                "Client-Secret: " . $this->client_secret,
                 "Authorization: Bearer " . $_SESSION['token']
             ));
 
@@ -150,10 +176,6 @@ class FormHandler
     }
 
 
-    public function calculateChecksum()
-    {
-        $date = date('Ymd');
-        return sha1(sha1($this->client_id . '_' . $this->client_secret_pre) . '_' . $date);
-    }
+
 
 }
