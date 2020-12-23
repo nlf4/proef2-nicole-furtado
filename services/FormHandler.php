@@ -71,13 +71,11 @@ class FormHandler
 
             $response = curl_exec($ch);
             $decoded = json_decode($response);
-//            var_dump($decoded);
 
             if (!isset($decoded->access_token)) {
                 echo "Invalid credentials - please try again";
                 die();
             } else {
-//                echo $decoded->access_token;
                 curl_close($ch);
 
                 /*  User authentication  *//////////////////////////
@@ -98,7 +96,6 @@ class FormHandler
                     curl_close($ch2);
 
                     $jsonArrayResponse = json_decode($userData);
-//                    var_dump($jsonArrayResponse);
 
                     // set session variables
                     if ($jsonArrayResponse->status === "success") {
@@ -110,7 +107,6 @@ class FormHandler
                         $_SESSION['signed_agreement'] = $jsonArrayResponse->result->signed_agreement;
                         $_SESSION['token'] = $decoded->access_token;
 
-//                        var_dump($_SESSION);
                         $authenticationSuccess = true;
 
                         //if agreement not signed, show modal

@@ -1,7 +1,7 @@
 <?php
-ini_set("error_reporting", E_ALL);
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+//ini_set("error_reporting", E_ALL);
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
 $_application_folder = "/questi-proef2";
 $_root_folder = $_SERVER['DOCUMENT_ROOT'];
 date_default_timezone_set('Europe/Amsterdam');
