@@ -54,6 +54,7 @@ class AgreementHandler
         $submitSuccess = true;
         $_SESSION['show_modal'] = false;
         $_SESSION['eulSubmitResponse'] = json_decode($response);
+        $_SESSION['signed_agreement'] = 1;
         return $submitSuccess;
     }
 
