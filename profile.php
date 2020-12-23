@@ -16,11 +16,12 @@ $data = array(
 $template = $viewService->loadTemplate("profile");
 print $viewService->replaceContentOneRow($data, $template);
 
-$eulContent = array(
-    "text" => $_SESSION['eulHtml']
-);
+
 
 if($_SESSION['show_modal'] === true) {
+    $eulContent = array(
+        "text" => $_SESSION['eulHtml']
+    );
     $modal_template = $viewService->loadTemplate("eul_modal");
     print $viewService->replaceContentOneRow($eulContent, $modal_template);
 }
